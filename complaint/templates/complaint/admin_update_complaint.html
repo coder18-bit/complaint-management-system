@@ -1,0 +1,44 @@
+{% extends 'complaint/base.html' %}
+
+{% block title %}Edit Complaint{% endblock %}
+{% block page_title %}Edit Complaint{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white fw-bold">
+        Edit Complaint #{{ complaint.id }}
+    </div>
+
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="btn btn-success">
+                Update Complaint
+            </button>
+
+            <a href="{% url 'admin_dashboard' %}"
+               class="btn btn-secondary">
+                Cancel
+            </a>
+        </form>
+    </div>
+</div>
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    const statusField = document.getElementById('id_status');
+
+    if (statusField && statusField.value === 'Cancel') {
+        const confirmed = confirm(
+            'Do you want to cancel this complaint?'
+        );
+
+        if (!confirmed) {
+            e.preventDefault();
+        }
+    }
+});
+</script>
+{% endblock %}

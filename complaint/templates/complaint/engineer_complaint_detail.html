@@ -1,0 +1,122 @@
+{% extends 'complaint/base.html' %}
+{% block page_title %}Complaint {% endblock %}
+{% block sidebar %}
+  <a href="{% url 'engineer_dashboard' %}"><i class="bi bi-arrow-left me-2"></i>My Dashboard</a>
+{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white fw-bold">Complaint Details</div>
+      <div class="card-body">
+        <h5>{{ complaint.title }}</h5>
+        <p class="text-muted">{{ complaint.description }}</p>
+        <strong>Priority:</strong> <span class="badge badge-{{ complaint.priority }}">{{ complaint.get_priority_display }}</span>
+        <strong class="ms-3">Status:</strong> <span class="badge badge-{{ complaint.status }}">{{ complaint.get_status_display }}</span>
+      </div>
+    </div>
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold">Update Complaint / Reassign</div>
+      <div class="card-body">
+        {% if is_current_assignee %}
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            {% if field.name != 'note' %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">{{ field.label }}</label>
+              {{ field }}
+            </div>
+            {% endif %}
+          {% endfor %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Note / Update</label>
+            {{ form.note }}
+          </div>
+          <button type="button" class="btn btn-success" id="updateBtn"style="background:#1a3c5e;border:none;">Save Update</button>
+        </form>
+        <div class="modal fade" id="cancelModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Cancellation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        Do you want to cancel this complaint?
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal">
+          No
+        </button>
+
+        <button type="button" class="btn btn-danger" id="confirmCancel">
+          Yes, Cancel Complaint
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+        {% else %}
+
+<div class="alert alert-info">
+    This complaint has been forwarded. Only the current assignee can update it.
+</div>
+
+{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold">History</div>
+      <ul class="list-group list-group-flush">
+        {% for h in history %}
+        <li class="list-group-item">
+          <small class="text-muted">{{ h.timestamp|date:"d M Y H:i" }} — {{ h.changed_by.username }}</small>
+          <p class="mb-0 mt-1">{{ h.note }}</p>
+          {% if h.old_status %}<small>{{ h.old_status }} → {{ h.new_status }}</small>{% endif %}
+        </li>
+        {% empty %}<li class="list-group-item text-muted">No history.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.querySelector('form');
+    const updateBtn = document.getElementById('updateBtn');
+    const statusField = document.getElementById('id_status');
+
+    updateBtn.addEventListener('click', function () {
+
+        if (statusField && statusField.value === 'Cancel') {
+
+            const modal = new bootstrap.Modal(
+                document.getElementById('cancelModal')
+            );
+
+            modal.show();
+
+        } else {
+            form.submit();
+        }
+    });
+
+    document.getElementById('confirmCancel')
+        .addEventListener('click', function () {
+            form.submit();
+        });
+
+});
+</script>
+
+
+{% endblock %}

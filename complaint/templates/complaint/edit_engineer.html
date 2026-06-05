@@ -1,0 +1,69 @@
+{% extends 'complaint/base.html' %}
+
+{% block page_title %}Edit Engineer{% endblock %}
+
+{% block sidebar %}
+<a href="{% url 'engineer_list' %}">
+    <i class="bi bi-arrow-left me-2"></i>Back to Engineers
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white fw-bold">
+        Edit Engineer
+    </div>
+
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>First Name</label>
+                    <input type="text"
+                           name="first_name"
+                           class="form-control"
+                           value="{{ engineer.user.first_name }}">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Last Name</label>
+                    <input type="text"
+                           name="last_name"
+                           class="form-control"
+                           value="{{ engineer.user.last_name }}">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email"
+                       name="email"
+                       class="form-control"
+                       value="{{ engineer.user.email }}">
+            </div>
+
+            <div class="mb-3">
+                <label>Phone</label>
+                <input type="text"
+                       name="phone"
+                       class="form-control"
+                       value="{{ engineer.phone }}">
+            </div>
+
+            <div class="mb-3">
+                <label>Department</label>
+                <input type="text"
+                       name="department"
+                       class="form-control"
+                       value="{{ engineer.department }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'complaint/base.html' %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block sidebar %}
+  {% if user.is_staff %}
+    <a href="{% url 'admin_dashboard' %}"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
+  {% else %}
+    <a href="{% url 'engineer_dashboard' %}"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
+  {% endif %}
+{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm" style="max-width:650px;">
+  <div class="card-header bg-white fw-bold">{{ title }}</div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small class="text-muted">{{ field.help_text }}</small>{% endif %}
+          {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary fw-semibold" style="background:#1a3c5e;border:none;">Submit Complaint</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

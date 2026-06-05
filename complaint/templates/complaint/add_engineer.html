@@ -1,0 +1,24 @@
+{% extends 'complaint/base.html' %}
+{% block page_title %}Add Engineer{% endblock %}
+{% block sidebar %}
+  <a href="{% url 'admin_dashboard' %}"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
+  <a href="{% url 'engineer_list' %}"><i class="bi bi-people me-2"></i>All Engineers</a>
+{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm" style="max-width:550px;">
+  <div class="card-header bg-white fw-bold">Add New Engineer</div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary fw-semibold" style="background:#1a3c5e;border:none;"><i class="bi bi-person-plus me-1"></i>Add Engineer</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
