@@ -32,6 +32,11 @@
           <div class="mb-3">
             <label class="form-label fw-semibold">Note / Update</label>
             {{ form.note }}
+             {% if form.note.errors %}
+        <div class="text-danger mt-1">
+            {{ form.note.errors }}
+        </div>
+    {% endif %}
           </div>
           <button type="button" class="btn btn-success" id="updateBtn"style="background:#1a3c5e;border:none;">Save Update</button>
         </form>

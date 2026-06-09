@@ -107,6 +107,7 @@ def admin_update_complaint(request, pk):
             print("STATUS FROM FORM:", form.cleaned_data['status'])
 
             updated = form.save()
+            
 
             ComplaintHistory.objects.create(
                 complaint=updated,
@@ -267,6 +268,8 @@ def engineer_complaint_detail(request, pk):
             messages.error(request, "You cannot modify a forwarded complaint.")
             return redirect('engineer_dashboard')
         form = UpdateComplaintForm(request.POST, instance=complaint, current_engineer=engineer)
+        print("FORM VALID?", form.is_valid())
+        print(form.errors)
         if form.is_valid():
             complaint.refresh_from_db()
             old_status = complaint.status
@@ -274,20 +277,26 @@ def engineer_complaint_detail(request, pk):
             # Explicitly update assignee from cleaned_data before saving.
 # Required because assigned_to was not being updated correctly by form.save(commit=False).
             updated = form.save(commit=False)
+
+            updated.status = form.cleaned_data['status']
             updated.assigned_to = form.cleaned_data['assigned_to']
             if updated.assigned_to and updated.assigned_to != old_assignee:
                 updated.forwarded_by = engineer
+                if complaint.status == "open":
+                    updated.status = "in_progress"
+            
             if updated.assigned_to is None:
                 updated.assigned_to = engineer
             if updated.status == 'resolved' and not complaint.resolved_at:
                 updated.resolved_at = timezone.now()
-                print("ENGINEER STATUS:", updated.status)
+                
             updated.save()
             ComplaintHistory.objects.create(
                 complaint=updated, changed_by=request.user,
                 note=form.cleaned_data['note'],
                 old_status=old_status, new_status=updated.status
             )
+            print("HISTORY:", old_status, "->", updated.status)
             messages.success(request, 'Complaint updated.')
             return redirect('engineer_dashboard')
     else:
