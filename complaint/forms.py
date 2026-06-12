@@ -40,7 +40,10 @@ class UpdateComplaintForm(forms.ModelForm):
             self.fields['assigned_to'].queryset = Engineer.objects.exclude(id=current_engineer.id)
             current_status = self.instance.status
             if current_status == "open":
-                allowed = ["open", "in_progress", "Cancel", "resolved"]
+                if self.instance.assigned_to:
+                    allowed = ["in_progress", "Cancel", "resolved"]
+                else:
+                    allowed = ["open", "in_progress", "Cancel", "resolved"]
             elif current_status == "in_progress":
                 allowed = ["in_progress", "Cancel", "resolved"]
             elif current_status == "Cancel":

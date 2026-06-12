@@ -106,7 +106,10 @@ def admin_update_complaint(request, pk):
             old_status = complaint.status
             print("STATUS FROM FORM:", form.cleaned_data['status'])
 
-            updated = form.save()
+            updated = form.save(commit=False)
+            if updated.assigned_to and updated.status == "open":
+                updated.status = "in_progress"
+                updated.save()
             
 
             ComplaintHistory.objects.create(
@@ -237,6 +240,9 @@ def engineer_register_complaint(request):
             complaint.registered_by = request.user
             if not complaint.assigned_to:
                 complaint.assigned_to = engineer
+            
+            if complaint.assigned_to:
+                complaint.status = "in_progress"
             complaint.save()
             ComplaintHistory.objects.create(
                 complaint=complaint, changed_by=request.user,
@@ -282,8 +288,8 @@ def engineer_complaint_detail(request, pk):
             updated.assigned_to = form.cleaned_data['assigned_to']
             if updated.assigned_to and updated.assigned_to != old_assignee:
                 updated.forwarded_by = engineer
-                if complaint.status == "open":
-                    updated.status = "in_progress"
+            if updated.assigned_to and updated.status == "open":
+                updated.status = "in_progress"
             
             if updated.assigned_to is None:
                 updated.assigned_to = engineer
