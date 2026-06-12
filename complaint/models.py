@@ -3,6 +3,8 @@ from django.db import models
 # Create your models here.
 
 from django.contrib.auth.models import User
+import random
+import string
 
 class Engineer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -29,6 +31,12 @@ class Complaint(models.Model):
 
     title = models.CharField(max_length=200)
     description = models.TextField()
+    reference_id = models.CharField(
+    max_length=15,
+    unique=True,
+    blank=True,
+    null=True
+)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
     registered_by = models.ForeignKey(
@@ -50,8 +58,23 @@ class Complaint(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
 
+    def generate_reference_id(self):
+        while True:
+         ref_id = "CMP-" + "".join(
+            random.choices(string.ascii_uppercase + string.digits, k=6)
+        )
+
+         if not Complaint.objects.filter(reference_id=ref_id).exists():
+            return ref_id
+    
+    def save(self, *args, **kwargs):
+        if not self.reference_id:
+            self.reference_id = self.generate_reference_id()
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"#{self.id} - {self.title}"
+        return f"#{self.reference_id} - {self.title}"
 
 
 class ComplaintHistory(models.Model):

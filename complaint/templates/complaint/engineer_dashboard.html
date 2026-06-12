@@ -7,10 +7,43 @@
 {% endblock %}
 {% block content %}
 <div class="row g-3 mb-4">
-  <div class="col-md-3"><div class="stat-card" style="background:#1a3c5e;"><div class="fs-2 fw-bold">{{ stats.total }}</div><div>My Complaints</div></div></div>
-  <div class="col-md-3"><div class="stat-card" style="background:#e85d26;"><div class="fs-2 fw-bold">{{ stats.open }}</div><div>Open</div></div></div>
-  <div class="col-md-3"><div class="stat-card" style="background:#0d6efd;"><div class="fs-2 fw-bold">{{ stats.in_progress }}</div><div>In Progress</div></div></div>
-  <div class="col-md-3"><div class="stat-card" style="background:#198754;"><div class="fs-2 fw-bold">{{ stats.resolved }}</div><div>Resolved</div></div></div>
+
+  <div class="col-md-3">
+    <a href="{% url 'engineer_dashboard' %}" class="text-decoration-none">
+      <div class="stat-card" style="background:#1a3c5e; cursor:pointer;">
+        <div class="fs-2 fw-bold">{{ stats.total }}</div>
+        <div>My Complaints</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <a href="{% url 'engineer_dashboard' %}?status=open" class="text-decoration-none">
+      <div class="stat-card" style="background:#e85d26; cursor:pointer;">
+        <div class="fs-2 fw-bold">{{ stats.open }}</div>
+        <div>Open</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <a href="{% url 'engineer_dashboard' %}?status=in_progress" class="text-decoration-none">
+      <div class="stat-card" style="background:#0d6efd; cursor:pointer;">
+        <div class="fs-2 fw-bold">{{ stats.in_progress }}</div>
+        <div>In Progress</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <a href="{% url 'engineer_dashboard' %}?status=resolved" class="text-decoration-none">
+      <div class="stat-card" style="background:#198754; cursor:pointer;">
+        <div class="fs-2 fw-bold">{{ stats.resolved }}</div>
+        <div>Resolved</div>
+      </div>
+    </a>
+  </div>
+
 </div>
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white fw-bold">My Assigned Complaints</div>
@@ -42,10 +75,10 @@
 
         {% if complaints.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1">&laquo; First</a>
+                <a class="page-link" href="?status={{ request.GET.status }}&page=1">&laquo; First</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ complaints.previous_page_number }}">Previous</a>
+                <a class="page-link" href="?status={{ request.GET.status }}&page={{ complaints.previous_page_number }}">Previous</a>
             </li>
         {% endif %}
 
@@ -56,17 +89,17 @@
                 </li>
             {% elif num > complaints.number|add:'-3' and num < complaints.number|add:'3' %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="?status={{ request.GET.status }}&page={{ num }}">{{ num }}</a>
                 </li>
             {% endif %}
         {% endfor %}
 
         {% if complaints.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ complaints.next_page_number }}">Next</a>
+                <a class="page-link" href="?status={{ request.GET.status }}&page={{ complaints.next_page_number }}">Next</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ complaints.paginator.num_pages }}">Last &raquo;</a>
+                <a class="page-link" href="?status={{ request.GET.status }}&page={{ complaints.paginator.num_pages }}">Last &raquo;</a>
             </li>
         {% endif %}
 

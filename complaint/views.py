@@ -40,16 +40,27 @@ def dashboard(request):
 def admin_dashboard(request):
     if not is_admin(request.user):
         return redirect('engineer_dashboard')
-    complaints_list = Complaint.objects.all().order_by('-created_at')
-    paginator = Paginator(complaints_list, 10)  # 10 complaints per page
+
+    status_filter = request.GET.get('status')
+
+    complaints_list = Complaint.objects.all()
+
+    if status_filter:
+        complaints_list = complaints_list.filter(status=status_filter)
+
+    complaints_list = complaints_list.order_by('-created_at')
+
+    paginator = Paginator(complaints_list, 10)
     page_number = request.GET.get('page')
     complaints = paginator.get_page(page_number)
+
     stats = {
-        'total': complaints_list.count(),
-        'open': complaints_list.filter(status='open').count(),
-        'in_progress': complaints_list.filter(status='in_progress').count(),
-        'resolved': complaints_list.filter(status='resolved').count(),
+        'total': Complaint.objects.count(),
+        'open': Complaint.objects.filter(status='open').count(),
+        'in_progress': Complaint.objects.filter(status='in_progress').count(),
+        'resolved': Complaint.objects.filter(status='resolved').count(),
     }
+
     return render(request, 'complaint/admin_dashboard.html', {
         'complaints': complaints,
         'stats': stats,
@@ -205,25 +216,56 @@ def edit_engineer(request, pk):
 @login_required
 def engineer_dashboard(request):
     engineer = get_engineer(request.user)
+
     if not engineer:
         logout(request)
         return redirect('login')
-    
+
+    status_filter = request.GET.get('status')
+
     complaints_list = Complaint.objects.filter(
-    models.Q(assigned_to=engineer) |
-    models.Q(forwarded_by=engineer)
-).distinct().order_by('-created_at')
+        models.Q(assigned_to=engineer) |
+        models.Q(forwarded_by=engineer)
+    ).distinct()
+
+    if status_filter:
+        complaints_list = complaints_list.filter(status=status_filter)
+
+    complaints_list = complaints_list.order_by('-created_at')
+
     paginator = Paginator(complaints_list, 10)
     page_number = request.GET.get('page')
     complaints = paginator.get_page(page_number)
+
     stats = {
-        'total': complaints_list.count(),
-        'open': complaints_list.filter(status='open').count(),
-        'in_progress': complaints_list.filter(status='in_progress').count(),
-        'resolved': complaints_list.filter(status='resolved').count(),
+        'total': Complaint.objects.filter(
+            models.Q(assigned_to=engineer) |
+            models.Q(forwarded_by=engineer)
+        ).distinct().count(),
+
+        'open': Complaint.objects.filter(
+            models.Q(assigned_to=engineer) |
+            models.Q(forwarded_by=engineer),
+            status='open'
+        ).distinct().count(),
+
+        'in_progress': Complaint.objects.filter(
+            models.Q(assigned_to=engineer) |
+            models.Q(forwarded_by=engineer),
+            status='in_progress'
+        ).distinct().count(),
+
+        'resolved': Complaint.objects.filter(
+            models.Q(assigned_to=engineer) |
+            models.Q(forwarded_by=engineer),
+            status='resolved'
+        ).distinct().count(),
     }
+
     return render(request, 'complaint/engineer_dashboard.html', {
-        'complaints': complaints, 'engineer': engineer, 'stats': stats
+        'complaints': complaints,
+        'engineer': engineer,
+        'stats': stats,
     })
 
 
