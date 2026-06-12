@@ -47,6 +47,29 @@
   </div>
 
 </div>
+<form method="GET" class="mb-3">
+    <div class="input-group">
+        <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Search by Ref ID, Title, Description, Engineer..."
+            value="{{ request.GET.q }}"
+        >
+
+        {% if request.GET.status %}
+            <input type="hidden" name="status" value="{{ request.GET.status }}">
+        {% endif %}
+
+        <button class="btn btn-primary" type="submit">
+            Search
+        </button>
+
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+            Clear
+        </a>
+    </div>
+</form>
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white fw-bold">All Complaints</div>
   <div class="card-body p-0">
@@ -91,10 +114,10 @@
 
         {% if complaints.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?status={{ request.GET.status }}&page=1">&laquo; First</a>
+                <a class="page-link" href="?status={{ request.GET.status }}&q={{ request.GET.q }}&page=1">&laquo; First</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?status={{ request.GET.status }}&page={{ complaints.previous_page_number }}">Previous</a>
+                <a class="page-link" href="?status={{ request.GET.status }}&q={{ request.GET.q }}&page={{ complaints.previous_page_number }}">Previous</a>
             </li>
         {% endif %}
 
@@ -105,17 +128,17 @@
                 </li>
             {% elif num > complaints.number|add:'-3' and num < complaints.number|add:'3' %}
                 <li class="page-item">
-                   <a class="page-link" href="?status={{ request.GET.status }}&page={{ num }}">{{ num }}</a>
+                   <a class="page-link" href="?status={{ request.GET.status }}&q={{ request.GET.q }}&page={{ num }}">{{ num }}</a>
                 </li>
             {% endif %}
         {% endfor %}
 
         {% if complaints.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?status={{ request.GET.status }}&page={{ complaints.next_page_number }}">Next</a>
+                <a class="page-link" href="?status={{ request.GET.status }}&q={{ request.GET.q }}&page={{ complaints.next_page_number }}">Next</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?status={{ request.GET.status }}&page={{ complaints.paginator.num_pages }}">Last &raquo;</a>
+                <a class="page-link" href="?status={{ request.GET.status }}&q={{ request.GET.q }}&page={{ complaints.paginator.num_pages }}">Last &raquo;</a>
             </li>
         {% endif %}
 

@@ -1,5 +1,5 @@
 {% extends 'complaint/base.html' %}
-{% block page_title %}Complaint {% endblock %}
+{% block page_title %}Complaint #{{ complaint.reference_id }}{% endblock %}
 {% block sidebar %}
   <a href="{% url 'admin_dashboard' %}"><i class="bi bi-arrow-left me-2"></i>All Complaints</a>
 {% endblock %}
@@ -9,6 +9,11 @@
     <div class="card border-0 shadow-sm mb-4">
       <div class="card-header bg-white fw-bold">Complaint Details</div>
       <div class="card-body">
+        <div class="mb-2">
+    <span class="badge bg-dark">
+        {{ complaint.reference_id }}
+    </span>
+</div>
         <h5>{{ complaint.title }}</h5>
         <p class="text-muted">{{ complaint.description }}</p>
         <div class="row">

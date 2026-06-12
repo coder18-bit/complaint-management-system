@@ -42,11 +42,25 @@ def admin_dashboard(request):
         return redirect('engineer_dashboard')
 
     status_filter = request.GET.get('status')
+    search_query = request.GET.get('q')
 
     complaints_list = Complaint.objects.all()
 
     if status_filter:
         complaints_list = complaints_list.filter(status=status_filter)
+    
+    if search_query:
+        complaints_list = complaints_list.filter(
+        Q(reference_id__icontains=search_query) |
+        Q(title__icontains=search_query) |
+        Q(description__icontains=search_query) |
+        Q(assigned_to__user__first_name__icontains=search_query) |
+        Q(assigned_to__user__last_name__icontains=search_query) |
+        Q(assigned_to__user__username__icontains=search_query) |
+        Q(registered_by__first_name__icontains=search_query) |
+Q(registered_by__last_name__icontains=search_query) |
+Q(registered_by__username__icontains=search_query)
+    )
 
     complaints_list = complaints_list.order_by('-created_at')
 
@@ -222,6 +236,7 @@ def engineer_dashboard(request):
         return redirect('login')
 
     status_filter = request.GET.get('status')
+    search_query = request.GET.get('q')
 
     complaints_list = Complaint.objects.filter(
         models.Q(assigned_to=engineer) |
@@ -230,6 +245,19 @@ def engineer_dashboard(request):
 
     if status_filter:
         complaints_list = complaints_list.filter(status=status_filter)
+    
+    if search_query:
+      complaints_list = complaints_list.filter(
+        Q(reference_id__icontains=search_query) |
+        Q(title__icontains=search_query) |
+        Q(description__icontains=search_query) |
+        Q(assigned_to__user__first_name__icontains=search_query) |
+        Q(assigned_to__user__last_name__icontains=search_query) |
+        Q(assigned_to__user__username__icontains=search_query)|
+        Q(registered_by__first_name__icontains=search_query) |
+        Q(registered_by__last_name__icontains=search_query) |
+        Q(registered_by__username__icontains=search_query)
+    )
 
     complaints_list = complaints_list.order_by('-created_at')
 
